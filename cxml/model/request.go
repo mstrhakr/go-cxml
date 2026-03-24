@@ -30,9 +30,9 @@ type OrderRequest struct {
 }
 
 type OrderChangeRequest struct {
-	XMLName                xml.Name            `xml:"OrderChangeRequest"`
-	OrderRequestReference  *OrderRequestHeader `xml:"OrderRequestReference,omitempty"`
-	ItemChange             []*ItemOut          `xml:"ItemChange,omitempty"`
+	XMLName               xml.Name            `xml:"OrderChangeRequest"`
+	OrderRequestReference *OrderRequestHeader `xml:"OrderRequestReference,omitempty"`
+	ItemChange            []*ItemOut          `xml:"ItemChange,omitempty"`
 }
 
 type OrderRequestHeader struct {

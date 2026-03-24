@@ -2,6 +2,8 @@ package validation
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -25,6 +27,13 @@ func (v *DTDValidator) Validate(xml []byte) error {
 
 	if !strings.Contains(normalized, "<!doctype cxml") {
 		return errors.New("validation: missing cXML doctype")
+	}
+
+	if dtddir := os.Getenv("CXML_DTD_DIR"); dtddir != "" {
+		candidate := filepath.Join(dtddir, "1.2.069", "cXML.dtd")
+		if _, err := os.Stat(candidate); err != nil {
+			return errors.New("validation: local DTD file not found: " + candidate)
+		}
 	}
 
 	return nil
