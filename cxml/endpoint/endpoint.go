@@ -3,15 +3,19 @@ package endpoint
 import (
 	"github.com/mstrhakr/go-cxml/cxml/auth"
 	"github.com/mstrhakr/go-cxml/cxml/credential"
+	"github.com/mstrhakr/go-cxml/cxml/document"
 	"github.com/mstrhakr/go-cxml/cxml/processor"
 	"github.com/mstrhakr/go-cxml/cxml/serializer"
+	"github.com/mstrhakr/go-cxml/cxml/validation"
 )
 
 type Endpoint struct {
-	serializer     *serializer.Serializer
-	processor      *processor.Processor
-	authenticator  auth.Authenticator
-	credentialRepo credential.CredentialRepository
+	serializer      *serializer.Serializer
+	processor       *processor.Processor
+	authenticator   auth.Authenticator
+	credentialRepo  credential.CredentialRepository
+	dtdValidator    *validation.DTDValidator
+	documentRegistry document.DocumentRegistry
 }
 
 func NewEndpoint(proc *processor.Processor, authc auth.Authenticator, repo credential.CredentialRepository) *Endpoint {
@@ -25,14 +29,30 @@ func NewEndpoint(proc *processor.Processor, authc auth.Authenticator, repo crede
 		repo = credential.NewRegistry(nil)
 	}
 	return &Endpoint{
-		serializer:     serializer.NewSerializer(),
-		processor:      proc,
-		authenticator:  authc,
-		credentialRepo: repo,
+		serializer:      serializer.NewSerializer(),
+		processor:       proc,
+		authenticator:   authc,
+		credentialRepo:  repo,
+		dtdValidator:    validation.NewDTDValidator(),
+		documentRegistry: document.NewInMemoryRegistry(),
 	}
 }
 
+func (e *Endpoint) SetDTDValidator(v *validation.DTDValidator) {
+	e.dtdValidator = v
+}
+
+func (e *Endpoint) SetDocumentRegistry(r document.DocumentRegistry) {
+	e.documentRegistry = r
+}
+
 func (e *Endpoint) Process(input []byte) ([]byte, error) {
+	if e.dtdValidator != nil {
+		if err := e.dtdValidator.Validate(input); err != nil {
+			return nil, err
+		}
+	}
+
 	doc, err := e.serializer.Deserialize(input)
 	if err != nil {
 		return nil, err
@@ -42,9 +62,17 @@ func (e *Endpoint) Process(input []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	if e.documentRegistry != nil && doc != nil && doc.PayloadID != "" {
+		e.documentRegistry.Save(doc.PayloadID, doc)
+	}
+
 	out, err := e.processor.Process(doc)
 	if err != nil {
 		return nil, err
+	}
+
+	if e.documentRegistry != nil && out != nil && out.PayloadID != "" {
+		e.documentRegistry.Save(out.PayloadID, out)
 	}
 
 	return e.serializer.Serialize(out)

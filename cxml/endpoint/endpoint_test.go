@@ -30,6 +30,7 @@ func TestEndpoint_Process_Success(t *testing.T) {
 	ep := NewEndpoint(proc, authc, repo)
 
 	input := []byte(`<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd">
 <cXML payloadID="abc" timestamp="2026-03-24T12:34:56" version="1.2.014">
   <Header>
     <Sender>
@@ -64,6 +65,7 @@ func TestEndpoint_Process_AuthFail(t *testing.T) {
 	ep := NewEndpoint(proc, authc, repo)
 
 	input := []byte(`<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd">
 <cXML payloadID="abc" timestamp="2026-03-24T12:34:56" version="1.2.014">
   <Header>
     <Sender>
