@@ -5,6 +5,7 @@ import "github.com/mstrhakr/go-cxml/cxml/model"
 type CredentialRepository interface {
 	Validate(cred *model.Credential) bool
 	Find(domain, identity, sharedSecret string) (*model.Credential, bool)
+	Count() int
 }
 
 type Registry struct {
@@ -33,4 +34,8 @@ func (r *Registry) Find(domain, identity, sharedSecret string) (*model.Credentia
 		}
 	}
 	return nil, false
+}
+
+func (r *Registry) Count() int {
+	return len(r.entries)
 }

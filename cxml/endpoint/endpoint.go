@@ -48,6 +48,12 @@ func (e *Endpoint) SetDocumentRegistry(r document.DocumentRegistry) {
 	e.documentRegistry = r
 }
 
+func (e *Endpoint) SetCredentialRepository(r credential.CredentialRepository) {
+	if r != nil {
+		e.credentialRepo = r
+	}
+}
+
 func (e *Endpoint) Process(input []byte) ([]byte, error) {
 	if e.dtdValidator != nil {
 		if err := e.dtdValidator.Validate(input); err != nil {

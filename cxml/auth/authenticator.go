@@ -18,6 +18,10 @@ func NewSimpleSharedSecretAuthenticator() *SimpleSharedSecretAuthenticator {
 }
 
 func (a *SimpleSharedSecretAuthenticator) Authenticate(c *model.CXML, repo credential.CredentialRepository) error {
+	if repo == nil || repo.Count() == 0 {
+		// No credentials configured means open access (legacy behavior when SharedSecret is blank)
+		return nil
+	}
 	if c == nil || c.Sender == nil || c.Sender.Credential == nil {
 		return errors.New("auth: missing sender credential")
 	}
