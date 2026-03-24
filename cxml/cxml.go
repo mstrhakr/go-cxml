@@ -1,0 +1,23 @@
+package cxml
+
+import (
+	"github.com/mstrhakr/go-cxml/cxml/model"
+	"github.com/mstrhakr/go-cxml/cxml/serializer"
+)
+
+// Endpoint is the primary entry point for cXML processing.
+type Endpoint struct {
+	serializer *serializer.Serializer
+}
+
+func NewEndpoint() *Endpoint {
+	return &Endpoint{serializer: serializer.NewSerializer()}
+}
+
+func (e *Endpoint) Serialize(doc *model.CXML) ([]byte, error) {
+	return e.serializer.Serialize(doc)
+}
+
+func (e *Endpoint) Deserialize(data []byte) (*model.CXML, error) {
+	return e.serializer.Deserialize(data)
+}
