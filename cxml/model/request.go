@@ -3,9 +3,21 @@ package model
 import "encoding/xml"
 
 type Request struct {
-	XMLName        xml.Name      `xml:"Request"`
-	DeploymentMode string        `xml:"deploymentMode,attr,omitempty"`
-	Payload        *OrderRequest `xml:"OrderRequest,omitempty"`
+	XMLName              xml.Name              `xml:"Request"`
+	DeploymentMode       string                `xml:"deploymentMode,attr,omitempty"`
+	OrderRequest         *OrderRequest         `xml:"OrderRequest,omitempty"`
+	PunchOutOrderMessage *PunchOutOrderMessage `xml:"PunchOutOrderMessage,omitempty"`
+}
+
+func (r *Request) PayloadType() string {
+	switch {
+	case r.OrderRequest != nil:
+		return "OrderRequest"
+	case r.PunchOutOrderMessage != nil:
+		return "PunchOutOrderMessage"
+	default:
+		return ""
+	}
 }
 
 type OrderRequest struct {

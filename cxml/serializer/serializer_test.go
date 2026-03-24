@@ -1,9 +1,10 @@
 package serializer
 
 import (
+	"testing"
+
 	"github.com/mstrhakr/go-cxml/cxml/model"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestSerializeAndDeserialize(t *testing.T) {
@@ -14,7 +15,7 @@ func TestSerializeAndDeserialize(t *testing.T) {
 		From:      &model.Party{Identity: "FromCompany"},
 		To:        &model.Party{Identity: "ToCompany"},
 		Sender:    &model.Sender{UserAgent: "go-cxml"},
-		Request: &model.Request{Payload: &model.OrderRequest{
+		Request: &model.Request{OrderRequest: &model.OrderRequest{
 			OrderRequestHeader: &model.OrderRequestHeader{OrderID: "PO-1001", OrderDate: "2026-03-24"},
 		}},
 	}
@@ -29,7 +30,8 @@ func TestSerializeAndDeserialize(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "12345", decoded.PayloadID)
 	if assert.NotNil(t, decoded.Request) {
-		assert.Equal(t, "PO-1001", decoded.Request.Payload.OrderRequestHeader.OrderID)
+		assert.NotNil(t, decoded.Request.OrderRequest)
+		assert.Equal(t, "PO-1001", decoded.Request.OrderRequest.OrderRequestHeader.OrderID)
 	}
 }
 
@@ -58,5 +60,23 @@ func TestDeserializeWithDoctype(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "abc", decoded.PayloadID)
 	assert.NotNil(t, decoded.Request)
-	assert.Equal(t, "PO-99", decoded.Request.Payload.OrderRequestHeader.OrderID)
+	assert.Equal(t, "PO-99", decoded.Request.OrderRequest.OrderRequestHeader.OrderID)
+}
+
+func TestSerializeAndDeserialize_PunchOutOrderMessage(t *testing.T) {
+	doc := &model.CXML{
+		PayloadID: "punch1",
+		Request:   &model.Request{PunchOutOrderMessage: &model.PunchOutOrderMessage{PunchOutOrderMessageHeader: &model.PunchOutOrderMessageHeader{Operation: "create"}}},
+	}
+
+	s := NewSerializer()
+	encoded, err := s.Serialize(doc)
+	assert.NoError(t, err)
+	assert.Contains(t, string(encoded), "PunchOutOrderMessage")
+
+	decoded, err := s.Deserialize(encoded)
+	assert.NoError(t, err)
+	assert.NotNil(t, decoded.Request)
+	assert.NotNil(t, decoded.Request.PunchOutOrderMessage)
+	assert.Equal(t, "create", decoded.Request.PunchOutOrderMessage.PunchOutOrderMessageHeader.Operation)
 }

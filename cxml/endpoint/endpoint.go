@@ -10,11 +10,11 @@ import (
 )
 
 type Endpoint struct {
-	serializer      *serializer.Serializer
-	processor       *processor.Processor
-	authenticator   auth.Authenticator
-	credentialRepo  credential.CredentialRepository
-	dtdValidator    *validation.DTDValidator
+	serializer       *serializer.Serializer
+	processor        *processor.Processor
+	authenticator    auth.Authenticator
+	credentialRepo   credential.CredentialRepository
+	dtdValidator     *validation.DTDValidator
 	documentRegistry document.DocumentRegistry
 }
 
@@ -29,11 +29,11 @@ func NewEndpoint(proc *processor.Processor, authc auth.Authenticator, repo crede
 		repo = credential.NewRegistry(nil)
 	}
 	return &Endpoint{
-		serializer:      serializer.NewSerializer(),
-		processor:       proc,
-		authenticator:   authc,
-		credentialRepo:  repo,
-		dtdValidator:    validation.NewDTDValidator(),
+		serializer:       serializer.NewSerializer(),
+		processor:        proc,
+		authenticator:    authc,
+		credentialRepo:   repo,
+		dtdValidator:     validation.NewDTDValidator(),
 		documentRegistry: document.NewInMemoryRegistry(),
 	}
 }

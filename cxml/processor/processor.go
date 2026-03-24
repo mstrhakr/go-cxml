@@ -2,6 +2,7 @@ package processor
 
 import (
 	"errors"
+
 	"github.com/mstrhakr/go-cxml/cxml/handler"
 	"github.com/mstrhakr/go-cxml/cxml/model"
 )
@@ -22,9 +23,9 @@ func (p *Processor) Process(doc *model.CXML) (*model.CXML, error) {
 		return nil, errors.New("cxml: nil document")
 	}
 
-	payloadName := ""
+	var payloadName string
 	if doc.IsRequest() {
-		payloadName = "OrderRequest"
+		payloadName = doc.Request.PayloadType()
 	} else if doc.IsResponse() {
 		payloadName = "Response"
 	} else if doc.IsMessage() {

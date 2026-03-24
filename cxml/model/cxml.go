@@ -22,10 +22,7 @@ type CXML struct {
 func (c *CXML) GetPayloadType() string {
 	switch {
 	case c.Request != nil:
-		return "Request"
-	case c.Response != nil:
-		return "Response"
-	case c.Message != nil:
+		return c.Request.PayloadType()
 		return "Message"
 	default:
 		return ""
