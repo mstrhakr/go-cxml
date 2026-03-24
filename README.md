@@ -1,1 +1,3 @@
-Pure GO implementation of the cXML standard.
+# go-cxml
+
+Pure GO implementation of the cXML standard
