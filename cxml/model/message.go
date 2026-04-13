@@ -8,6 +8,16 @@ type Message struct {
 	Payload *PayloadWrapper `xml:"Payload,omitempty"`
 }
 
+func (m *Message) PayloadType() string {
+	if m == nil {
+		return ""
+	}
+	if m.Payload != nil {
+		return "Payload"
+	}
+	return "Message"
+}
+
 type PayloadWrapper struct {
 	XMLName xml.Name `xml:"Payload"`
 	Content string   `xml:",innerxml"`

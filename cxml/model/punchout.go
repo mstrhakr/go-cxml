@@ -10,25 +10,75 @@ type PunchOutOrderMessage struct {
 }
 
 type PunchOutOrderMessageHeader struct {
-	XMLName                xml.Name `xml:"PunchOutOrderMessageHeader"`
-	PunchOutOrderMessageID string   `xml:"payloadID,attr,omitempty"`
-	Operation              string   `xml:"operation,attr,omitempty"`
-	Total                  *Money   `xml:"Total>Money,omitempty"`
+	XMLName                xml.Name           `xml:"PunchOutOrderMessageHeader"`
+	PunchOutOrderMessageID string             `xml:"payloadID,attr,omitempty"`
+	Operation              string             `xml:"operation,attr,omitempty"`
+	OperationAllowed       string             `xml:"operationAllowed,attr,omitempty"`
+	Total                  *Money             `xml:"Total>Money,omitempty"`
+	ShipTo                 *ShipTo            `xml:"ShipTo,omitempty"`
+	Shipping               *Shipping          `xml:"Shipping,omitempty"`
+	Tax                    *Tax               `xml:"Tax,omitempty"`
+	SupplierOrderInfo      *SupplierOrderInfo `xml:"SupplierOrderInfo,omitempty"`
 }
 
 type ItemIn struct {
-	XMLName    xml.Name    `xml:"ItemIn"`
-	Quantity   float64     `xml:"quantity,attr,omitempty"`
-	LineNumber int         `xml:"lineNumber,attr,omitempty"`
+	XMLName            xml.Name        `xml:"ItemIn"`
+	Quantity           float64         `xml:"quantity,attr,omitempty"`
+	LineNumber         int             `xml:"lineNumber,attr,omitempty"`
+	ParentLineNumber   string          `xml:"parentLineNumber,attr,omitempty"`
+	ItemType           string          `xml:"itemType,attr,omitempty"`
+	CompositeItemType  string          `xml:"compositeItemType,attr,omitempty"`
+	ItemClassification string          `xml:"itemClassification,attr,omitempty"`
+	ItemCategory       string          `xml:"itemCategory,attr,omitempty"`
+	ItemID             *ItemID         `xml:"ItemID,omitempty"`
+	ItemDetail         *ItemDetail     `xml:"ItemDetail,omitempty"`
+	ShipTo             *ShipTo         `xml:"ShipTo,omitempty"`
+	Shipping           *Shipping       `xml:"Shipping,omitempty"`
+	Tax                *Tax            `xml:"Tax,omitempty"`
+	SpendDetail        *SpendDetail    `xml:"SpendDetail,omitempty"`
+	Distribution       []*Distribution `xml:"Distribution,omitempty"`
+	Contact            []*Contact      `xml:"Contact,omitempty"`
+}
+
+// PunchOutSetupRequest opens a PunchOut session.
+type PunchOutSetupRequest struct {
+	XMLName         xml.Name         `xml:"PunchOutSetupRequest"`
+	Operation       string           `xml:"operation,attr,omitempty"`
+	BuyerCookie     string           `xml:"BuyerCookie,omitempty"`
+	Extrinsic       []*Extrinsic     `xml:"Extrinsic,omitempty"`
+	BrowserFormPost *BrowserFormPost `xml:"BrowserFormPost,omitempty"`
+	Contact         []*Contact       `xml:"Contact,omitempty"`
+	SupplierSetup   *SupplierSetup   `xml:"SupplierSetup,omitempty"`
+	ShipTo          *ShipTo          `xml:"ShipTo,omitempty"`
+	SelectedItem    *SelectedItem    `xml:"SelectedItem,omitempty"`
+	ItemOut         []*ItemOut       `xml:"ItemOut,omitempty"`
+}
+
+type BrowserFormPost struct {
+	XMLName xml.Name `xml:"BrowserFormPost"`
+	URL     *URL     `xml:"URL,omitempty"`
+}
+
+type SupplierSetup struct {
+	XMLName xml.Name `xml:"SupplierSetup"`
+	URL     *URL     `xml:"URL,omitempty"`
+}
+
+type SelectedItem struct {
+	XMLName    xml.Name    `xml:"SelectedItem"`
 	ItemID     *ItemID     `xml:"ItemID,omitempty"`
 	ItemDetail *ItemDetail `xml:"ItemDetail,omitempty"`
 }
 
-// ItemID used in PunchOut messages.
-type ItemID struct {
-	XMLName                 xml.Name `xml:"ItemID"`
-	SupplierPartID          string   `xml:"SupplierPartID,omitempty"`
-	SupplierPartAuxiliaryID string   `xml:"SupplierPartAuxiliaryID,omitempty"`
+// PunchOutSetupResponse returns the PunchOut start page.
+type PunchOutSetupResponse struct {
+	XMLName   xml.Name   `xml:"PunchOutSetupResponse"`
+	StartPage *StartPage `xml:"StartPage,omitempty"`
+}
+
+type StartPage struct {
+	XMLName xml.Name `xml:"StartPage"`
+	URL     *URL     `xml:"URL,omitempty"`
 }
 
 func (p *PunchOutOrderMessage) RequestPayloadName() string {

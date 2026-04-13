@@ -80,3 +80,93 @@ func TestSerializeAndDeserialize_PunchOutOrderMessage(t *testing.T) {
 	assert.NotNil(t, decoded.Request.PunchOutOrderMessage)
 	assert.Equal(t, "create", decoded.Request.PunchOutOrderMessage.PunchOutOrderMessageHeader.Operation)
 }
+
+func TestSerializeAndDeserialize_ShipNoticeRequest(t *testing.T) {
+	doc := &model.CXML{
+		PayloadID: "sn-round-trip",
+		Request: &model.Request{
+			ShipNoticeRequest: &model.ShipNoticeRequest{
+				ShipNoticeHeader: &model.ShipNoticeHeader{
+					ShipmentID: "SHIP-42",
+					NoticeDate: "2026-04-01T00:00:00",
+					Operation:  "new",
+				},
+			},
+		},
+	}
+
+	s := NewSerializer()
+	encoded, err := s.Serialize(doc)
+	assert.NoError(t, err)
+	assert.Contains(t, string(encoded), "ShipNoticeRequest")
+	assert.Contains(t, string(encoded), "SHIP-42")
+
+	decoded, err := s.Deserialize(encoded)
+	assert.NoError(t, err)
+	assert.NotNil(t, decoded.Request)
+	assert.NotNil(t, decoded.Request.ShipNoticeRequest)
+	assert.Equal(t, "SHIP-42", decoded.Request.ShipNoticeRequest.ShipNoticeHeader.ShipmentID)
+	assert.Equal(t, "ShipNoticeRequest", decoded.Request.PayloadType())
+}
+
+func TestSerializeAndDeserialize_InvoiceDetailRequest(t *testing.T) {
+	doc := &model.CXML{
+		PayloadID: "inv-round-trip",
+		Request: &model.Request{
+			InvoiceDetailRequest: &model.InvoiceDetailRequest{
+				InvoiceDetailRequestHeader: &model.InvoiceDetailRequestHeader{
+					InvoiceID:   "INV-99",
+					InvoiceDate: "2026-04-01T00:00:00",
+				},
+				InvoiceDetailSummary: &model.InvoiceDetailSummary{
+					SubtotalAmount: &model.SubtotalAmount{Money: &model.Money{Currency: "USD", Value: "500.00"}},
+					Tax:            &model.Tax{Money: &model.Money{Currency: "USD", Value: "0.00"}},
+					NetAmount:      &model.NetAmount{Money: &model.Money{Currency: "USD", Value: "500.00"}},
+				},
+			},
+		},
+	}
+
+	s := NewSerializer()
+	encoded, err := s.Serialize(doc)
+	assert.NoError(t, err)
+	assert.Contains(t, string(encoded), "InvoiceDetailRequest")
+	assert.Contains(t, string(encoded), "INV-99")
+
+	decoded, err := s.Deserialize(encoded)
+	assert.NoError(t, err)
+	assert.NotNil(t, decoded.Request)
+	assert.NotNil(t, decoded.Request.InvoiceDetailRequest)
+	assert.Equal(t, "INV-99", decoded.Request.InvoiceDetailRequest.InvoiceDetailRequestHeader.InvoiceID)
+	assert.Equal(t, "InvoiceDetailRequest", decoded.Request.PayloadType())
+}
+
+func TestSerializeAndDeserialize_ConfirmationRequest(t *testing.T) {
+	doc := &model.CXML{
+		PayloadID: "conf-round-trip",
+		Request: &model.Request{
+			ConfirmationRequest: &model.ConfirmationRequest{
+				ConfirmationHeader: &model.ConfirmationHeader{
+					ConfirmID:  "CONF-1",
+					Operation:  "accept",
+					NoticeDate: "2026-04-01T00:00:00",
+				},
+				OrderReference: &model.OrderReference{OrderID: "PO-123"},
+			},
+		},
+	}
+
+	s := NewSerializer()
+	encoded, err := s.Serialize(doc)
+	assert.NoError(t, err)
+	assert.Contains(t, string(encoded), "ConfirmationRequest")
+	assert.Contains(t, string(encoded), "CONF-1")
+
+	decoded, err := s.Deserialize(encoded)
+	assert.NoError(t, err)
+	assert.NotNil(t, decoded.Request)
+	assert.NotNil(t, decoded.Request.ConfirmationRequest)
+	assert.Equal(t, "CONF-1", decoded.Request.ConfirmationRequest.ConfirmationHeader.ConfirmID)
+	assert.Equal(t, "PO-123", decoded.Request.ConfirmationRequest.OrderReference.OrderID)
+	assert.Equal(t, "ConfirmationRequest", decoded.Request.PayloadType())
+}

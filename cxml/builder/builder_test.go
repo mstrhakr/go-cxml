@@ -56,3 +56,43 @@ func TestOrderChangeBuilder(t *testing.T) {
 	assert.NotNil(t, doc.Request)
 	assert.Equal(t, "order-1", doc.Request.OrderChangeRequest.OrderRequestReference.OrderID)
 }
+
+func TestShipNoticeBuilder(t *testing.T) {
+	sn := &model.ShipNoticeRequest{
+		ShipNoticeHeader: &model.ShipNoticeHeader{
+			ShipmentID: "SN-001",
+			NoticeDate: "2026-04-01T00:00:00",
+			Operation:  "new",
+		},
+	}
+	doc := NewShipNoticeBuilder().
+		PayloadID("p4").
+		Request(sn).
+		Build()
+
+	assert.NotNil(t, doc)
+	assert.NotNil(t, doc.Request)
+	assert.NotNil(t, doc.Request.ShipNoticeRequest)
+	assert.Equal(t, "SN-001", doc.Request.ShipNoticeRequest.ShipNoticeHeader.ShipmentID)
+	assert.Equal(t, "ShipNoticeRequest", doc.Request.PayloadType())
+}
+
+func TestInvoiceDetailBuilder(t *testing.T) {
+	inv := &model.InvoiceDetailRequest{
+		InvoiceDetailRequestHeader: &model.InvoiceDetailRequestHeader{
+			InvoiceID:   "INV-001",
+			InvoiceDate: "2026-04-01T00:00:00",
+			Operation:   "new",
+		},
+	}
+	doc := NewInvoiceDetailBuilder().
+		PayloadID("p5").
+		Request(inv).
+		Build()
+
+	assert.NotNil(t, doc)
+	assert.NotNil(t, doc.Request)
+	assert.NotNil(t, doc.Request.InvoiceDetailRequest)
+	assert.Equal(t, "INV-001", doc.Request.InvoiceDetailRequest.InvoiceDetailRequestHeader.InvoiceID)
+	assert.Equal(t, "InvoiceDetailRequest", doc.Request.PayloadType())
+}

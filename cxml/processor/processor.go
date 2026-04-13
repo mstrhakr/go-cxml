@@ -27,9 +27,9 @@ func (p *Processor) Process(doc *model.CXML) (*model.CXML, error) {
 	if doc.IsRequest() {
 		payloadName = doc.Request.PayloadType()
 	} else if doc.IsResponse() {
-		payloadName = "Response"
+		payloadName = doc.Response.PayloadType()
 	} else if doc.IsMessage() {
-		payloadName = "Message"
+		payloadName = doc.Message.PayloadType()
 	}
 
 	if payloadName == "" {
